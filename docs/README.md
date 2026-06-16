@@ -1,14 +1,14 @@
-# Status Sync API
+# Hikari API
 
 [简体中文](../README.md)
 
-Status Sync API is a lightweight backend for Status Sync Android. It receives status JSON uploaded by Android, stores the latest status, and cleans raw fields into structured JSON for the blog status card.
+Hikari API is a lightweight backend for Hikari. It receives status JSON uploaded by Android, stores the latest status, and cleans raw fields into structured JSON for the blog status card.
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| `POST` | `/upload` | Android raw status upload |
-| `GET` | `/status` | Cleaned status for the blog |
-| `GET` | `/health` | Health check |
+| `POST` | `/hikari/upload` | Android raw status upload |
+| `GET` | `/hikari/status` | Cleaned status for the blog |
+| `GET` | `/hikari/health` | Health check |
 
 No status:
 
@@ -43,7 +43,7 @@ Latest status:
 
 ## Processing
 
-Android upload fields come from `status-sync-android`:
+Android upload fields come from `hikari-android`:
 
 ```json
 {
@@ -88,7 +88,7 @@ Display delay is controlled by the Android app or frontend policy. The API no lo
 - The input storage path is controlled by `storage.path`, defaulting to `data/status.json`.
 - The stored file contains `id`, `received_at`, and the unprocessed `raw` input data.
 - If the upload is a receiver log object, the nested `data` object is stored as `raw`.
-- `/status` output is not stored separately. It is generated from `raw`, config, and geocoding results on each request.
+- `/hikari/status` output is not stored separately. It is generated from `raw`, config, and geocoding results on each request.
 - Reverse geocoding results are cached in memory. The cache TTL is controlled by `geocode.cache_ttl_seconds`, defaulting to 24 hours.
 - Reverse geocoding failures are logged and retried after `geocode.timeout_seconds * 2`. During the retry wait, a previous successful address is returned when available.
 - The geocoding cache and failure retry state are not written to a file or database and are lost when the API restarts.
@@ -116,9 +116,9 @@ Configuration items:
 | `geocode.endpoint` | Reverse geocoding API endpoint. Default is `https://restapi.amap.com/v3/geocode/regeo`. |
 | `geocode.timeout_seconds` | Reverse geocoding request timeout. |
 | `geocode.cache_ttl_seconds` | In-memory cache TTL for reverse geocoding results. |
-| `routes.upload` | Raw status upload path. Default is `/upload`. |
-| `routes.status` | Cleaned status read path. Default is `/status`. |
-| `routes.health` | Health check path. Default is `/health`. |
+| `routes.upload` | Raw status upload path. Default is `/hikari/upload`. |
+| `routes.status` | Cleaned status read path. Default is `/hikari/status`. |
+| `routes.health` | Health check path. Default is `/hikari/health`. |
 | `status.output_timezone` | Timezone for `updated_at`, such as `+08:00` or `UTC`. |
 | `status.online_threshold_seconds` | How many seconds after the latest upload should still count as online. |
 | `status.private_values` | Field values treated as intentionally hidden, such as `none`. |
@@ -130,17 +130,17 @@ Configuration items:
 Common environment overrides:
 
 ```text
-STATUS_SYNC_CONFIG
-STATUS_SYNC_UPLOAD_TOKEN
-STATUS_SYNC_CORS_ORIGINS
-STATUS_SYNC_STORAGE_PATH
-STATUS_SYNC_PORT
-STATUS_SYNC_OUTPUT_TIMEZONE
-STATUS_SYNC_GEOCODE_ENABLED
-STATUS_SYNC_GEOCODE_PROVIDER
-STATUS_SYNC_GEOCODE_API_KEY
-STATUS_SYNC_GEOCODE_ENDPOINT
-STATUS_SYNC_GEOCODE_USER_AGENT
+HIKARI_API_CONFIG
+HIKARI_API_UPLOAD_TOKEN
+HIKARI_API_CORS_ORIGINS
+HIKARI_API_STORAGE_PATH
+HIKARI_API_PORT
+HIKARI_API_OUTPUT_TIMEZONE
+HIKARI_API_GEOCODE_ENABLED
+HIKARI_API_GEOCODE_PROVIDER
+HIKARI_API_GEOCODE_API_KEY
+HIKARI_API_GEOCODE_ENDPOINT
+HIKARI_API_GEOCODE_USER_AGENT
 AMAP_KEY
 ```
 
@@ -159,7 +159,7 @@ py -3.11 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -e ".[dev]"
 Copy-Item config.example.yaml config.yaml
-status-sync-api
+hikari-api
 ```
 
 macOS/Linux:
@@ -169,7 +169,7 @@ python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e ".[dev]"
 cp config.example.yaml config.yaml
-status-sync-api
+hikari-api
 ```
 
 The default address is `http://localhost:8000`.
@@ -193,21 +193,21 @@ pytest
 ## Related Projects
 
 ```text
-Miafetta/status-sync-android
+Miafetta/hikari-android
         |
         | Uploads status
         v
-Miafetta/status-sync-api  <- Current project
+Miafetta/hikari-api  <- Current project
         |
         | Outputs cleaned status JSON
         v
 Miafetta/miafetta.github.io
 ```
 
-- [Miafetta/status-sync-android](https://github.com/Miafetta/status-sync-android): Android status collection and upload client.
-- [Miafetta/status-sync-api](https://github.com/Miafetta/status-sync-api): Status data processing API, the current project.
+- [Miafetta/hikari-android](https://github.com/Miafetta/hikari-android): Android status collection and upload client.
+- [Miafetta/hikari-api](https://github.com/Miafetta/hikari-api): Status data processing API, the current project.
 - [Miafetta/miafetta.github.io](https://github.com/Miafetta/miafetta.github.io): Blog display frontend.
 
 ## License
 
-Status Sync API is licensed under the GNU General Public License v3.0. See [LICENSE](../LICENSE) for details.
+Hikari API is licensed under the GNU General Public License v3.0. See [LICENSE](../LICENSE) for details.

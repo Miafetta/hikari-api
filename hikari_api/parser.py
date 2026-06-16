@@ -4,8 +4,8 @@ import re
 from collections.abc import Mapping
 from typing import Any
 
-from status_sync_api.geocoder import Geocoder, LocationAddress
-from status_sync_api.models import PhoneStatusData
+from hikari_api.geocoder import Geocoder, LocationAddress
+from hikari_api.models import PhoneStatusData
 
 BATTERY_LEVEL_RE = re.compile(r"^\s*level:\s*(\d{1,3})\s*$", re.IGNORECASE | re.MULTILINE)
 BATTERY_POWERED_RE = re.compile(

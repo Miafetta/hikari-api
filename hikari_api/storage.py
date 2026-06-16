@@ -8,7 +8,7 @@ from threading import Lock
 
 from pydantic import TypeAdapter
 
-from status_sync_api.models import StatusRecord
+from hikari_api.models import StatusRecord
 
 
 class JsonStatusStore:

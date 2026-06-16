@@ -10,17 +10,17 @@ from uuid import uuid4
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 
-from status_sync_api import __version__
-from status_sync_api.config import AppConfig, load_config
-from status_sync_api.geocoder import ReverseGeocoder
-from status_sync_api.models import (
+from hikari_api import __version__
+from hikari_api.config import AppConfig, load_config
+from hikari_api.geocoder import ReverseGeocoder
+from hikari_api.models import (
     LatestStatusResponse,
     RawStatusUpload,
     StatusRecord,
     UploadResponse,
 )
-from status_sync_api.parser import normalize_status, trim_raw_payload
-from status_sync_api.storage import JsonStatusStore
+from hikari_api.parser import normalize_status, trim_raw_payload
+from hikari_api.storage import JsonStatusStore
 
 TIMEZONE_OFFSET_RE = re.compile(r"^([+-])(\d{2}):?(\d{2})$")
 
@@ -31,9 +31,9 @@ def create_app(config: AppConfig | None = None) -> FastAPI:
     geocoder = ReverseGeocoder(app_config.geocode)
 
     app = FastAPI(
-        title="Status Sync API",
+        title="Hikari API",
         version=__version__,
-        description="Self-hosted API for Status Sync Android phone status uploads.",
+        description="Self-hosted API for Hikari phone status uploads.",
     )
     app.state.config = app_config
     app.state.store = store
@@ -50,7 +50,7 @@ def create_app(config: AppConfig | None = None) -> FastAPI:
     @app.get("/")
     def root() -> dict[str, str]:
         return {
-            "name": "status-sync-api",
+            "name": "hikari-api",
             "version": __version__,
             "docs": "/docs",
         }

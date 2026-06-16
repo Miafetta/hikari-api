@@ -27,16 +27,16 @@ geocode:
   provider: "amap"
   api_key: ""
   endpoint: "https://restapi.amap.com/v3/geocode/regeo"
-  user_agent: "status-sync-api/0.1"
+  user_agent: "hikari-api/0.1"
   language: "zh-CN"
   timeout_seconds: 5.0
   cache_ttl_seconds: 86400
   zoom: 12
 
 routes:
-  upload: "/upload"
-  status: "/status"
-  health: "/health"
+  upload: "hikari/upload"
+  status: "hikari/status"
+  health: "hikari/health"
 
 status:
   output_timezone: "+08:00"

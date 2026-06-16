@@ -1,14 +1,14 @@
-# Status Sync API
+# Hikari API
 
 [English Documentation Click Here](docs/README.md)
 
-Status Sync API 是 Status Sync Android 的轻量后端。它只负责接收 Android 上传的状态 JSON、保存最新状态，并把 raw 字段清洗为博客状态卡片需要的结构化 JSON。
+Hikari API 是 Hikari 的轻量后端。它只负责接收 Android 上传的状态 JSON、保存最新状态，并把 raw 字段清洗为博客状态卡片需要的结构化 JSON。
 
 | 方法 | 路径 | 用途 |
 | --- | --- | --- |
-| `POST` | `/upload` | Android 上传原始状态 |
-| `GET` | `/status` | 博客读取清洗后的状态 |
-| `GET` | `/health` | 健康检查 |
+| `POST` | `/hikari/upload` | Android 上传原始状态 |
+| `GET` | `/hikari/status` | 博客读取清洗后的状态 |
+| `GET` | `/hikari/health` | 健康检查 |
 
 无状态时返回：
 
@@ -43,7 +43,7 @@ Status Sync API 是 Status Sync Android 的轻量后端。它只负责接收 And
 
 ## 数据处理
 
-Android 上传字段来自 `status-sync-android`：
+Android 上传字段来自 `hikari-android`：
 
 ```json
 {
@@ -88,7 +88,7 @@ API 处理规则：
 - 输入保存位置由 `storage.path` 控制，默认是 `data/status.json`。
 - 保存文件包含 `id`、`received_at` 和清洗前的 `raw` 输入数据。
 - 如果上传内容是外层接收日志格式，API 会取其中的 `data` 对象作为 `raw` 保存。
-- `/status` 的输出不会单独保存，而是在每次请求时由 `raw`、配置和地理编码结果即时生成。
+- `/hikari/status` 的输出不会单独保存，而是在每次请求时由 `raw`、配置和地理编码结果即时生成。
 - 反向地理编码结果有进程内缓存，缓存时间由 `geocode.cache_ttl_seconds` 控制，默认 24 小时。
 - 反向地理编码失败后会记录日志，并在 `geocode.timeout_seconds * 2` 后重新查询；等待重试期间如有历史成功结果，会先返回历史地址。
 - 地理编码缓存和失败重试状态不会写入文件或数据库，API 重启后会丢失。
@@ -116,9 +116,9 @@ Copy-Item config.example.yaml config.yaml
 | `geocode.endpoint` | 反向地理编码 API 地址，默认 `https://restapi.amap.com/v3/geocode/regeo`。 |
 | `geocode.timeout_seconds` | 反向地理编码请求超时时间。 |
 | `geocode.cache_ttl_seconds` | 反向地理编码结果进程内缓存时间。 |
-| `routes.upload` | 原始状态上传路径，默认 `/upload`。 |
-| `routes.status` | 清洗后状态读取路径，默认 `/status`。 |
-| `routes.health` | 健康检查路径，默认 `/health`。 |
+| `routes.upload` | 原始状态上传路径，默认 `/hikari/upload`。 |
+| `routes.status` | 清洗后状态读取路径，默认 `/hikari/status`。 |
+| `routes.health` | 健康检查路径，默认 `/hikari/health`。 |
 | `status.output_timezone` | `updated_at` 输出时区，例如 `+08:00` 或 `UTC`。 |
 | `status.online_threshold_seconds` | 最新上报在多少秒内算在线。 |
 | `status.private_values` | 视为主动隐藏的字段值，例如 `none`。 |
@@ -130,17 +130,17 @@ Copy-Item config.example.yaml config.yaml
 环境变量可覆盖常用配置：
 
 ```text
-STATUS_SYNC_CONFIG
-STATUS_SYNC_UPLOAD_TOKEN
-STATUS_SYNC_CORS_ORIGINS
-STATUS_SYNC_STORAGE_PATH
-STATUS_SYNC_PORT
-STATUS_SYNC_OUTPUT_TIMEZONE
-STATUS_SYNC_GEOCODE_ENABLED
-STATUS_SYNC_GEOCODE_PROVIDER
-STATUS_SYNC_GEOCODE_API_KEY
-STATUS_SYNC_GEOCODE_ENDPOINT
-STATUS_SYNC_GEOCODE_USER_AGENT
+HIKARI_API_CONFIG
+HIKARI_API_UPLOAD_TOKEN
+HIKARI_API_CORS_ORIGINS
+HIKARI_API_STORAGE_PATH
+HIKARI_API_PORT
+HIKARI_API_OUTPUT_TIMEZONE
+HIKARI_API_GEOCODE_ENABLED
+HIKARI_API_GEOCODE_PROVIDER
+HIKARI_API_GEOCODE_API_KEY
+HIKARI_API_GEOCODE_ENDPOINT
+HIKARI_API_GEOCODE_USER_AGENT
 AMAP_KEY
 ```
 
@@ -159,7 +159,7 @@ py -3.11 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -e ".[dev]"
 Copy-Item config.example.yaml config.yaml
-status-sync-api
+hikari-api
 ```
 
 macOS/Linux：
@@ -169,7 +169,7 @@ python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e ".[dev]"
 cp config.example.yaml config.yaml
-status-sync-api
+hikari-api
 ```
 
 默认监听 `http://localhost:8000`。
@@ -193,21 +193,21 @@ pytest
 ## 相关项目
 
 ```text
-Miafetta/status-sync-android
+Miafetta/hikari-android
         |
         | 上传状态
         v
-Miafetta/status-sync-api  <- 当前项目
+Miafetta/hikari-api  <- 当前项目
         |
         | 输出清洗后的状态 JSON
         v
 Miafetta/miafetta.github.io
 ```
 
-- [Miafetta/status-sync-android](https://github.com/Miafetta/status-sync-android)：Android 状态采集与上传端。
-- [Miafetta/status-sync-api](https://github.com/Miafetta/status-sync-api)：状态数据处理 API，当前项目。
+- [Miafetta/hikari-android](https://github.com/Miafetta/hikari-android)：Android 状态采集与上传端。
+- [Miafetta/hikari-api](https://github.com/Miafetta/hikari-api)：状态数据处理 API，当前项目。
 - [Miafetta/miafetta.github.io](https://github.com/Miafetta/miafetta.github.io)：博客展示端。
 
 ## 许可证
 
-状态同步 API 使用 GNU General Public License v3.0 开源许可证。详情请查看 [LICENSE](LICENSE)。
+Hikari API 使用 GNU General Public License v3.0 开源许可证。详情请查看 [LICENSE](LICENSE)。

@@ -1,7 +1,7 @@
 services:
-  status-sync-api:
+  hikari-api:
     build: .
-    container_name: status-sync-api
+    container_name: hikari-api
     ports:
       - "8000:8000"
     volumes:

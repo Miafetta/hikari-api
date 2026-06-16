@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from status_sync_api.config import load_config
+from hikari_api.config import load_config
 
 
 def test_load_yaml_config(tmp_path) -> None:

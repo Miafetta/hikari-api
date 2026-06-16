@@ -8,7 +8,7 @@ from typing import Any, Protocol
 
 import httpx
 
-from status_sync_api.config import GeocodeConfig
+from hikari_api.config import GeocodeConfig
 
 logger = logging.getLogger(__name__)
 

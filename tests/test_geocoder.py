@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import logging
 
-from status_sync_api.config import GeocodeConfig
-from status_sync_api.geocoder import (
+from hikari_api.config import GeocodeConfig
+from hikari_api.geocoder import (
     LocationAddress,
     ReverseGeocoder,
     format_address,
@@ -163,7 +163,7 @@ def test_reverse_geocoder_uses_stale_address_until_failure_retry_window(
         ]
     )
 
-    monkeypatch.setattr("status_sync_api.geocoder.time.time", lambda: now)
+    monkeypatch.setattr("hikari_api.geocoder.time.time", lambda: now)
     caplog.set_level(logging.WARNING)
 
     assert geocoder.reverse(34.0, 108.0) == LocationAddress(
@@ -205,7 +205,7 @@ def test_reverse_geocoder_returns_none_during_failure_retry_window_without_histo
     now = 0.0
     geocoder = SequenceGeocoder([None])
 
-    monkeypatch.setattr("status_sync_api.geocoder.time.time", lambda: now)
+    monkeypatch.setattr("hikari_api.geocoder.time.time", lambda: now)
 
     assert geocoder.reverse(34.0, 108.0) is None
     assert geocoder.calls == 1

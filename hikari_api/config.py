@@ -39,9 +39,9 @@ class StorageConfig:
 
 @dataclass(frozen=True)
 class RoutesConfig:
-    upload: str = "/upload"
-    status: str = "/status"
-    health: str = "/health"
+    upload: str = "/hikari/upload"
+    status: str = "/hikari/status"
+    health: str = "/hikari/health"
 
 
 @dataclass(frozen=True)
@@ -73,7 +73,7 @@ class GeocodeConfig:
     provider: str = "amap"
     api_key: str = ""
     endpoint: str = DEFAULT_AMAP_REVERSE_GEOCODE_ENDPOINT
-    user_agent: str = "status-sync-api/0.1"
+    user_agent: str = "hikari-api/0.1"
     language: str = "zh-CN"
     timeout_seconds: float = 5.0
     cache_ttl_seconds: int = 86400
@@ -93,10 +93,10 @@ class AppConfig:
 
 
 def load_config(path: str | Path | None = None) -> AppConfig:
-    config_path = Path(path or os.getenv("STATUS_SYNC_CONFIG", DEFAULT_CONFIG_PATH))
+    config_path = Path(path or os.getenv("HIKARI_API_CONFIG", DEFAULT_CONFIG_PATH))
     data = _load_yaml(config_path)
     geocode_provider = _env_str(
-        "STATUS_SYNC_GEOCODE_PROVIDER",
+        "HIKARI_API_GEOCODE_PROVIDER",
         data,
         "geocode",
         "provider",
@@ -110,13 +110,13 @@ def load_config(path: str | Path | None = None) -> AppConfig:
 
     return AppConfig(
         server=ServerConfig(
-            host=_env_str("STATUS_SYNC_HOST", data, "server", "host", default="0.0.0.0"),
-            port=_env_int("STATUS_SYNC_PORT", data, "server", "port", default=8000),
+            host=_env_str("HIKARI_API_HOST", data, "server", "host", default="0.0.0.0"),
+            port=_env_int("HIKARI_API_PORT", data, "server", "port", default=8000),
         ),
         auth=AuthConfig(
-            upload_token=_env_str("STATUS_SYNC_UPLOAD_TOKEN", data, "auth", "upload_token"),
+            upload_token=_env_str("HIKARI_API_UPLOAD_TOKEN", data, "auth", "upload_token"),
             require_upload_token=_env_bool(
-                "STATUS_SYNC_REQUIRE_UPLOAD_TOKEN",
+                "HIKARI_API_REQUIRE_UPLOAD_TOKEN",
                 data,
                 "auth",
                 "require_upload_token",
@@ -126,7 +126,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         storage=StorageConfig(
             path=Path(
                 _env_str(
-                    "STATUS_SYNC_STORAGE_PATH",
+                    "HIKARI_API_STORAGE_PATH",
                     data,
                     "storage",
                     "path",
@@ -135,15 +135,15 @@ def load_config(path: str | Path | None = None) -> AppConfig:
             ),
         ),
         routes=RoutesConfig(
-            upload=_route_path(data, "routes", "upload", default="/upload"),
-            status=_route_path(data, "routes", "status", default="/status"),
-            health=_route_path(data, "routes", "health", default="/health"),
+            upload=_route_path(data, "routes", "upload", default="/hikari/upload"),
+            status=_route_path(data, "routes", "status", default="/hikari/status"),
+            health=_route_path(data, "routes", "health", default="/hikari/health"),
         ),
         status=StatusConfig(
             online_threshold_seconds=max(
                 1,
                 _env_int(
-                    "STATUS_SYNC_ONLINE_THRESHOLD_SECONDS",
+                    "HIKARI_API_ONLINE_THRESHOLD_SECONDS",
                     data,
                     "status",
                     "online_threshold_seconds",
@@ -151,7 +151,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
                 ),
             ),
             private_values=_env_list(
-                "STATUS_SYNC_PRIVATE_VALUES",
+                "HIKARI_API_PRIVATE_VALUES",
                 data,
                 "status",
                 "private_values",
@@ -160,7 +160,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
             max_raw_value_length=max(
                 100,
                 _env_int(
-                    "STATUS_SYNC_MAX_RAW_VALUE_LENGTH",
+                    "HIKARI_API_MAX_RAW_VALUE_LENGTH",
                     data,
                     "status",
                     "max_raw_value_length",
@@ -168,7 +168,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
                 ),
             ),
             output_timezone=_env_str(
-                "STATUS_SYNC_OUTPUT_TIMEZONE",
+                "HIKARI_API_OUTPUT_TIMEZONE",
                 data,
                 "status",
                 "output_timezone",
@@ -184,21 +184,21 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         ),
         cors=CorsConfig(
             allow_origins=_env_list(
-                "STATUS_SYNC_CORS_ORIGINS",
+                "HIKARI_API_CORS_ORIGINS",
                 data,
                 "cors",
                 "allow_origins",
                 default=["*"],
             ),
             allow_methods=_env_list(
-                "STATUS_SYNC_CORS_METHODS",
+                "HIKARI_API_CORS_METHODS",
                 data,
                 "cors",
                 "allow_methods",
                 default=["GET", "POST", "OPTIONS"],
             ),
             allow_headers=_env_list(
-                "STATUS_SYNC_CORS_HEADERS",
+                "HIKARI_API_CORS_HEADERS",
                 data,
                 "cors",
                 "allow_headers",
@@ -207,7 +207,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
         ),
         geocode=GeocodeConfig(
             enabled=_env_bool(
-                "STATUS_SYNC_GEOCODE_ENABLED",
+                "HIKARI_API_GEOCODE_ENABLED",
                 data,
                 "geocode",
                 "enabled",
@@ -215,28 +215,28 @@ def load_config(path: str | Path | None = None) -> AppConfig:
             ),
             provider=geocode_provider,
             api_key=_env_str(
-                "STATUS_SYNC_GEOCODE_API_KEY",
+                "HIKARI_API_GEOCODE_API_KEY",
                 data,
                 "geocode",
                 "api_key",
                 default=os.getenv("AMAP_KEY", ""),
             ),
             endpoint=_env_str(
-                "STATUS_SYNC_GEOCODE_ENDPOINT",
+                "HIKARI_API_GEOCODE_ENDPOINT",
                 data,
                 "geocode",
                 "endpoint",
                 default=geocode_endpoint_default,
             ),
             user_agent=_env_str(
-                "STATUS_SYNC_GEOCODE_USER_AGENT",
+                "HIKARI_API_GEOCODE_USER_AGENT",
                 data,
                 "geocode",
                 "user_agent",
-                default="status-sync-api/0.1",
+                default="hikari-api/0.1",
             ),
             language=_env_str(
-                "STATUS_SYNC_GEOCODE_LANGUAGE",
+                "HIKARI_API_GEOCODE_LANGUAGE",
                 data,
                 "geocode",
                 "language",
@@ -245,7 +245,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
             timeout_seconds=max(
                 0.5,
                 _env_float(
-                    "STATUS_SYNC_GEOCODE_TIMEOUT_SECONDS",
+                    "HIKARI_API_GEOCODE_TIMEOUT_SECONDS",
                     data,
                     "geocode",
                     "timeout_seconds",
@@ -255,7 +255,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
             cache_ttl_seconds=max(
                 60,
                 _env_int(
-                    "STATUS_SYNC_GEOCODE_CACHE_TTL_SECONDS",
+                    "HIKARI_API_GEOCODE_CACHE_TTL_SECONDS",
                     data,
                     "geocode",
                     "cache_ttl_seconds",
@@ -266,7 +266,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
                 3,
                 min(
                     18,
-                    _env_int("STATUS_SYNC_GEOCODE_ZOOM", data, "geocode", "zoom", default=12),
+                    _env_int("HIKARI_API_GEOCODE_ZOOM", data, "geocode", "zoom", default=12),
                 ),
             ),
         ),

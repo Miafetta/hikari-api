@@ -4,8 +4,8 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from status_sync_api.app import create_app
-from status_sync_api.config import (
+from hikari_api.app import create_app
+from hikari_api.config import (
     AppConfig,
     AuthConfig,
     GeocodeConfig,
@@ -14,7 +14,7 @@ from status_sync_api.config import (
     StatusConfig,
     StorageConfig,
 )
-from status_sync_api.geocoder import LocationAddress
+from hikari_api.geocoder import LocationAddress
 
 
 class FakeGeocoder:
@@ -49,7 +49,7 @@ def make_client(
 def test_empty_latest_status(tmp_path: Path) -> None:
     client = make_client(tmp_path)
 
-    response = client.get("/status")
+    response = client.get("/hikari/status")
 
     assert response.status_code == 200
     assert response.json() == {"online": False, "updated_at": None, "data": None}
@@ -58,7 +58,7 @@ def test_empty_latest_status(tmp_path: Path) -> None:
 def test_upload_requires_bearer_token(tmp_path: Path) -> None:
     client = make_client(tmp_path)
 
-    response = client.post("/upload", json={"model": "Pixel"})
+    response = client.post("/hikari/upload", json={"model": "Pixel"})
 
     assert response.status_code == 401
 
@@ -80,16 +80,16 @@ def test_upload_and_latest_status_matches_blog_shape(tmp_path: Path) -> None:
         "location_raw": (
             "last location=Location[network 34.246341,108.977993 hAcc=30.0]\nenabled=true"
         ),
-        "current_app_package": "com.miafetta.statussync",
-        "current_app_name": "状态同步",
+        "current_app_package": "com.miafetta.hikari",
+        "current_app_name": "Hikari",
     }
 
     upload_response = client.post(
-        "/upload",
+        "/hikari/upload",
         headers={"Authorization": "Bearer secret"},
         json=payload,
     )
-    latest_response = client.get("/status")
+    latest_response = client.get("/hikari/status")
 
     assert upload_response.status_code == 200
     latest = latest_response.json()
@@ -102,7 +102,7 @@ def test_upload_and_latest_status_matches_blog_shape(tmp_path: Path) -> None:
         "wifi_connected": True,
         "wifi_ssid": "Himouto!",
         "network_type": "4G",
-        "current_app": "状态同步",
+        "current_app": "Hikari",
         "province": "陕西省",
         "city": "西安市",
         "district": "雁塔区",
@@ -113,11 +113,11 @@ def test_network_type_keeps_multiple_active_radio_types(tmp_path: Path) -> None:
     client = make_client(tmp_path)
 
     response = client.post(
-        "/upload",
+        "/hikari/upload",
         headers={"Authorization": "Bearer secret"},
         json={"net_raw": "LTE,NR_SA,Unknown,lte"},
     )
-    latest_response = client.get("/status")
+    latest_response = client.get("/hikari/status")
 
     assert response.status_code == 200
     assert latest_response.json()["data"]["network_type"] == "4G | 5G"
@@ -127,7 +127,7 @@ def test_upload_accepts_receiver_log_wrapped_data(tmp_path: Path) -> None:
     client = make_client(tmp_path, geocoder=FakeGeocoder())
 
     response = client.post(
-        "/upload",
+        "/hikari/upload",
         headers={"Authorization": "Bearer secret"},
         json={
             "received_at": "2026-06-07T21:28:29.696091",
@@ -139,14 +139,14 @@ def test_upload_accepts_receiver_log_wrapped_data(tmp_path: Path) -> None:
                 "wifi_raw": 'Wifi is connected to "Himouto!"\nWifiInfo: SSID: "Himouto!"',
                 "net_raw": "LTE,Unknown",
                 "location_raw": "last location=Location[network 34.246341,108.977993 hAcc=30.0]",
-                "current_app_name": "状态同步",
+                "current_app_name": "Hikari",
             },
         },
     )
-    latest_response = client.get("/status")
+    latest_response = client.get("/hikari/status")
 
     assert response.status_code == 200
-    assert latest_response.json()["data"]["current_app"] == "状态同步"
+    assert latest_response.json()["data"]["current_app"] == "Hikari"
     assert latest_response.json()["data"]["province"] == "陕西省"
 
 
@@ -154,11 +154,11 @@ def test_uploaded_location_text_is_split_into_fields(tmp_path: Path) -> None:
     client = make_client(tmp_path)
 
     client.post(
-        "/upload",
+        "/hikari/upload",
         headers={"Authorization": "Bearer secret"},
         json={"location_text": "陕西省西安市雁塔区"},
     )
-    latest_response = client.get("/status")
+    latest_response = client.get("/hikari/status")
 
     assert latest_response.json()["data"] == {
         "device_name": None,
@@ -178,7 +178,7 @@ def test_private_payload_hides_public_data(tmp_path: Path) -> None:
     client = make_client(tmp_path)
 
     response = client.post(
-        "/upload",
+        "/hikari/upload",
         headers={"Authorization": "Bearer secret"},
         json={
             "model": "none",
@@ -189,7 +189,7 @@ def test_private_payload_hides_public_data(tmp_path: Path) -> None:
             "current_app_name": "none",
         },
     )
-    latest_response = client.get("/status")
+    latest_response = client.get("/hikari/status")
 
     assert response.status_code == 200
     assert latest_response.json()["data"] is None
