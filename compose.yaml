@@ -5,7 +5,7 @@ services:
     container_name: hikari-api
     init: true
     ports:
-      - "1210:1210"
+      - "127.0.0.1:1210:1210"
     volumes:
       - ./data:/app/data
       - type: bind

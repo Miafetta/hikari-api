@@ -185,11 +185,11 @@ docker compose logs -f
 
 默认使用 `compose.yaml`，需要 Docker Compose v2 或更新版本，构建的镜像为 `hikari-api:latest`。它挂载当前目录的 `config.yaml` 和 `data/`，服务配置以该文件为主；配置文件不存在时会直接报错，避免意外创建同名目录。
 
-默认发布端口为 `1210:1210`。健康检查自动读取配置中的监听端口和健康检查路径，日志最多保留 3 个 10 MB 文件。容器启用进程回收，并禁止获取额外权限。
+默认发布端口为 `127.0.0.1:1210:1210`，仅允许宿主机访问该映射端口。同一 Docker 网络中的服务仍可通过 `http://hikari-api:1210` 访问。健康检查自动读取配置中的监听端口和健康检查路径，日志最多保留 3 个 10 MB 文件。容器启用进程回收，并禁止获取额外权限。
 
 升级旧部署时，先备份已有配置和数据；保留 `config.yaml` 中的密钥等配置，只把 `server.port` 改为 `1210`，不要用示例文件覆盖。项目目录只保留一份 Hikari Compose 配置，移除旧的 `docker-compose.yml`，再运行 `docker compose up -d --build`。同时更新反向代理或 Cloudflare Tunnel 的源站端口，以及直接访问旧端口的客户端地址。
 
-如果只需宿主机上的代理访问，可将端口映射改为 `127.0.0.1:1210:1210`。如需自定义监听端口，请同时调整 `config.yaml` 的 `server.port` 和 Compose 中的容器端口映射。
+容器内的 `server.host` 保持 `0.0.0.0`，以供端口映射和同网络服务访问。如需自定义监听端口，请同时调整 `config.yaml` 的 `server.port` 和 Compose 中的容器端口映射。其他服务接入 `hikari-api_default` 时，更新应沿用 `hikari-api` 项目名，只重建 API 服务，不执行 `docker compose down`。
 
 ## 代码检查
 

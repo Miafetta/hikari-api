@@ -185,11 +185,11 @@ docker compose logs -f
 
 The default file is `compose.yaml`, requiring Docker Compose v2 or later. The built image is `hikari-api:latest`. It mounts `config.yaml` and `data/` from the current directory, and service configuration is read primarily from that file. A missing configuration file causes an error instead of creating a directory with the same name.
 
-The default port mapping is `1210:1210`. The health check reads the configured listen port and health route. Logs rotate across at most three 10 MB files. The container enables process reaping and prevents privilege escalation.
+The default port mapping is `127.0.0.1:1210:1210`, restricting access to the published port to the host. Services on the same Docker network can still use `http://hikari-api:1210`. The health check reads the configured listen port and health route. Logs rotate across at most three 10 MB files. The container enables process reaping and prevents privilege escalation.
 
 When upgrading an existing deployment, back up its configuration and data first. Keep secrets and other settings in `config.yaml` and change only `server.port` to `1210`; do not overwrite it with the example file. Keep a single Hikari Compose file in the project directory, remove the old `docker-compose.yml`, then run `docker compose up -d --build`. Update the origin port in your reverse proxy or Cloudflare Tunnel and any client URLs that access the old port directly.
 
-For access only through a host-side proxy, use `127.0.0.1:1210:1210` as the port mapping. To customize the listen port, update both `server.port` in `config.yaml` and the container port mapping in Compose.
+Keep `server.host` set to `0.0.0.0` inside the container for port publishing and access from other services on the same network. To customize the listen port, update both `server.port` in `config.yaml` and the container port mapping in Compose. When other services use `hikari-api_default`, keep the `hikari-api` project name and recreate only the API service without running `docker compose down`.
 
 ## Lint
 
