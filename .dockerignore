@@ -1,6 +1,5 @@
 .git
 .github
-.pytest_cache
 .ruff_cache
 .venv
 venv
@@ -9,6 +8,5 @@ dist
 build
 *.egg-info
 __pycache__
-config.toml
 config.yaml
-.server.pid
+.env

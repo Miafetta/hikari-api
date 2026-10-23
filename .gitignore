@@ -1,6 +1,5 @@
 __pycache__/
 *.py[cod]
-.pytest_cache/
 .ruff_cache/
 .venv/
 venv/
@@ -9,6 +8,4 @@ build/
 *.egg-info/
 data/
 .env
-config.toml
 config.yaml
-.server.pid

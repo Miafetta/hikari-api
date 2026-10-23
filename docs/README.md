@@ -125,7 +125,7 @@ Configuration items:
 | `status.max_raw_value_length` | Maximum saved length for a single raw field. |
 | `storage.path` | Latest status JSON storage path. |
 | `server.host` | Service listen host. Usually `0.0.0.0` inside Docker. |
-| `server.port` | Service listen port. Default is `8000`. |
+| `server.port` | Service listen port. Default is `1210`. |
 
 Common environment overrides:
 
@@ -150,12 +150,12 @@ If the log shows `USERKEY_PLAT_NOMATCH`, make sure the key is an Amap **Web Serv
 
 ## Run Locally
 
-Python 3.11 or later is supported. The commands below use 3.11 as the example.
+Python 3.14 or later is required. The Python requirement is declared in `pyproject.toml` and read directly by CI and Ruff. The Docker image uses Python 3.14.
 
 Windows:
 
 ```powershell
-py -3.11 -m venv .venv
+py -3.14 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -e ".[dev]"
 Copy-Item config.example.yaml config.yaml
@@ -165,29 +165,36 @@ hikari-api
 macOS/Linux:
 
 ```bash
-python3.11 -m venv .venv
+python3.14 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e ".[dev]"
 cp config.example.yaml config.yaml
 hikari-api
 ```
 
-The default address is `http://localhost:8000`.
+The default address is `http://localhost:1210`. Recreate existing virtual environments with Python 3.14 when upgrading.
 
 ## Docker
 
 ```bash
 cp config.example.yaml config.yaml
 docker compose up -d --build
+docker compose ps
+docker compose logs -f
 ```
 
-By default, `docker-compose.yml` mounts `config.yaml` from the current directory, and service configuration is read primarily from that file.
+The default file is `compose.yaml`, requiring Docker Compose v2 or later. The built image is `hikari-api:latest`. It mounts `config.yaml` and `data/` from the current directory, and service configuration is read primarily from that file. A missing configuration file causes an error instead of creating a directory with the same name.
 
-## Test
+The default port mapping is `1210:1210`. The health check reads the configured listen port and health route. Logs rotate across at most three 10 MB files. The container enables process reaping and prevents privilege escalation.
+
+When upgrading an existing deployment, back up its configuration and data first. Keep secrets and other settings in `config.yaml` and change only `server.port` to `1210`; do not overwrite it with the example file. Keep a single Hikari Compose file in the project directory, remove the old `docker-compose.yml`, then run `docker compose up -d --build`. Update the origin port in your reverse proxy or Cloudflare Tunnel and any client URLs that access the old port directly.
+
+For access only through a host-side proxy, use `127.0.0.1:1210:1210` as the port mapping. To customize the listen port, update both `server.port` in `config.yaml` and the container port mapping in Compose.
+
+## Lint
 
 ```bash
 ruff check .
-pytest
 ```
 
 ## Related Projects

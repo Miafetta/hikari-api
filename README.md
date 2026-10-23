@@ -125,7 +125,7 @@ Copy-Item config.example.yaml config.yaml
 | `status.max_raw_value_length` | 单个 raw 字段最大保存字符数。 |
 | `storage.path` | 最新状态 JSON 文件保存位置。 |
 | `server.host` | 服务监听地址。Docker 内通常为 `0.0.0.0`。 |
-| `server.port` | 服务监听端口，默认 `8000`。 |
+| `server.port` | 服务监听端口，默认 `1210`。 |
 
 环境变量可覆盖常用配置：
 
@@ -150,12 +150,12 @@ AMAP_KEY
 
 ## 本地运行
 
-需要 Python 3.11 或更高版本，以下命令以 3.11 为例。
+需要 Python 3.14 或更高版本。Python 版本要求统一声明在 `pyproject.toml` 中，CI 和 Ruff 直接读取；Docker 镜像使用 Python 3.14。
 
 Windows：
 
 ```powershell
-py -3.11 -m venv .venv
+py -3.14 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -e ".[dev]"
 Copy-Item config.example.yaml config.yaml
@@ -165,29 +165,36 @@ hikari-api
 macOS/Linux：
 
 ```bash
-python3.11 -m venv .venv
+python3.14 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e ".[dev]"
 cp config.example.yaml config.yaml
 hikari-api
 ```
 
-默认监听 `http://localhost:8000`。
+默认监听 `http://localhost:1210`。升级已有环境时，请用 Python 3.14 重新创建虚拟环境。
 
 ## Docker
 
 ```bash
 cp config.example.yaml config.yaml
 docker compose up -d --build
+docker compose ps
+docker compose logs -f
 ```
 
-默认 `docker-compose.yml` 会挂载当前目录的 `config.yaml`，服务配置以该文件为主。
+默认使用 `compose.yaml`，需要 Docker Compose v2 或更新版本，构建的镜像为 `hikari-api:latest`。它挂载当前目录的 `config.yaml` 和 `data/`，服务配置以该文件为主；配置文件不存在时会直接报错，避免意外创建同名目录。
 
-## 测试
+默认发布端口为 `1210:1210`。健康检查自动读取配置中的监听端口和健康检查路径，日志最多保留 3 个 10 MB 文件。容器启用进程回收，并禁止获取额外权限。
+
+升级旧部署时，先备份已有配置和数据；保留 `config.yaml` 中的密钥等配置，只把 `server.port` 改为 `1210`，不要用示例文件覆盖。项目目录只保留一份 Hikari Compose 配置，移除旧的 `docker-compose.yml`，再运行 `docker compose up -d --build`。同时更新反向代理或 Cloudflare Tunnel 的源站端口，以及直接访问旧端口的客户端地址。
+
+如果只需宿主机上的代理访问，可将端口映射改为 `127.0.0.1:1210:1210`。如需自定义监听端口，请同时调整 `config.yaml` 的 `server.port` 和 Compose 中的容器端口映射。
+
+## 代码检查
 
 ```bash
 ruff check .
-pytest
 ```
 
 ## 相关项目

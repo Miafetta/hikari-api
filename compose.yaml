@@ -1,0 +1,24 @@
+services:
+  hikari-api:
+    image: hikari-api
+    build: .
+    container_name: hikari-api
+    init: true
+    ports:
+      - "1210:1210"
+    volumes:
+      - ./data:/app/data
+      - type: bind
+        source: ./config.yaml
+        target: /app/config.yaml
+        read_only: true
+        bind:
+          create_host_path: false
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

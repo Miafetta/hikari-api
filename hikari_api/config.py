@@ -23,7 +23,7 @@ DEFAULT_NETWORK_ALIASES: dict[str, str | None] = {
 @dataclass(frozen=True)
 class ServerConfig:
     host: str = "0.0.0.0"
-    port: int = 8000
+    port: int = 1210
 
 
 @dataclass(frozen=True)
@@ -111,7 +111,7 @@ def load_config(path: str | Path | None = None) -> AppConfig:
     return AppConfig(
         server=ServerConfig(
             host=_env_str("HIKARI_API_HOST", data, "server", "host", default="0.0.0.0"),
-            port=_env_int("HIKARI_API_PORT", data, "server", "port", default=8000),
+            port=_env_int("HIKARI_API_PORT", data, "server", "port", default=1210),
         ),
         auth=AuthConfig(
             upload_token=_env_str("HIKARI_API_UPLOAD_TOKEN", data, "auth", "upload_token"),
