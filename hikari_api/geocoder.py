@@ -163,7 +163,11 @@ class ReverseGeocoder:
                 "Reverse geocoding request failed for %.5f,%.5f: %s",
                 latitude,
                 longitude,
-                exc,
+                (
+                    exc.response.status_code
+                    if isinstance(exc, httpx.HTTPStatusError)
+                    else type(exc).__name__
+                ),
             )
             return None
         except ValueError as exc:

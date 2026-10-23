@@ -129,7 +129,9 @@ async def require_upload_auth(
 
 def _is_bearer_token_valid(authorization: str | None, expected_token: str) -> bool:
     scheme, _, token = (authorization or "").partition(" ")
-    return scheme.lower() == "bearer" and secrets.compare_digest(token, expected_token)
+    return scheme.lower() == "bearer" and secrets.compare_digest(
+        token.encode(), expected_token.encode()
+    )
 
 
 def _extract_status_payload(payload: RawStatusUpload) -> dict[str, Any]:
