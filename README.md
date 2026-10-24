@@ -150,13 +150,14 @@ AMAP_KEY
 
 ## 本地运行
 
-需要 Python 3.14 或更高版本。Python 版本要求统一声明在 `pyproject.toml` 中，CI 和 Ruff 直接读取；Docker 镜像使用 Python 3.14。
+需要 Python 3.14.9 或更高版本。Python 版本要求统一声明在 `pyproject.toml` 中，CI 和 Ruff 直接读取；Docker 镜像使用 Python 3.14.9。
 
 Windows：
 
 ```powershell
 py -3.14 -m venv .venv
 .\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade "pip>=26.2.2"
 python -m pip install -e ".[dev]"
 Copy-Item config.example.yaml config.yaml
 hikari-api
@@ -167,12 +168,13 @@ macOS/Linux：
 ```bash
 python3.14 -m venv .venv
 source .venv/bin/activate
+python -m pip install --upgrade "pip>=26.2.2"
 python -m pip install -e ".[dev]"
 cp config.example.yaml config.yaml
 hikari-api
 ```
 
-默认监听 `http://localhost:1210`。升级已有环境时，请用 Python 3.14 重新创建虚拟环境。
+默认监听 `http://localhost:1210`。升级已有环境时，请用 Python 3.14.9 或更高版本重新创建虚拟环境。
 
 ## Docker
 

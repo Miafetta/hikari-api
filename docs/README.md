@@ -150,13 +150,14 @@ If the log shows `USERKEY_PLAT_NOMATCH`, make sure the key is an Amap **Web Serv
 
 ## Run Locally
 
-Python 3.14 or later is required. The Python requirement is declared in `pyproject.toml` and read directly by CI and Ruff. The Docker image uses Python 3.14.
+Python 3.14.9 or later is required. The Python requirement is declared in `pyproject.toml` and read directly by CI and Ruff. The Docker image uses Python 3.14.9.
 
 Windows:
 
 ```powershell
 py -3.14 -m venv .venv
 .\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade "pip>=26.2.2"
 python -m pip install -e ".[dev]"
 Copy-Item config.example.yaml config.yaml
 hikari-api
@@ -167,12 +168,13 @@ macOS/Linux:
 ```bash
 python3.14 -m venv .venv
 source .venv/bin/activate
+python -m pip install --upgrade "pip>=26.2.2"
 python -m pip install -e ".[dev]"
 cp config.example.yaml config.yaml
 hikari-api
 ```
 
-The default address is `http://localhost:1210`. Recreate existing virtual environments with Python 3.14 when upgrading.
+The default address is `http://localhost:1210`. Recreate existing virtual environments with Python 3.14.9 or later when upgrading.
 
 ## Docker
 
